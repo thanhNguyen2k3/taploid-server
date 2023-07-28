@@ -22,16 +22,24 @@ const Post_1 = require("./entities/Post");
 const post_1 = require("./resolvers/post");
 const Upvote_1 = require("./entities/Upvote");
 const dataLoader_1 = require("./utils/dataLoader");
+const path_1 = __importDefault(require("path"));
 const main = async () => {
-    const connection = await (0, typeorm_1.createConnection)({
-        type: 'postgres',
+    const connection = await (0, typeorm_1.createConnection)(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: 'postgres' }, (constant_1.__prod__ ? { url: process.env.DATABASE_URL } : {
         database: 'tabloid',
         username: process.env.DB_USERNAME_DEV,
         password: process.env.DB_PASSWORD_DEV,
-        logging: true,
+    })), { logging: true }), (constant_1.__prod__ ? {
+        extra: {
+            ssl: {
+                rejectUnauthorized: false,
+            }
+        },
+        ssl: true
+    } : {})), (constant_1.__prod__ ? {} : {
         synchronize: true,
-        entities: [User_1.User, Post_1.Post, Upvote_1.Upvote],
-    });
+    })), { entities: [User_1.User, Post_1.Post, Upvote_1.Upvote], migrations: [path_1.default.join(__dirname, '/migrations/*')] }));
+    if (!constant_1.__prod__)
+        await connection.runMigrations();
     const app = (0, express_1.default)();
     const mongoUrl = `mongodb+srv://thanhnguyendev:${process.env.MONGO_DB_PASSWORD}@cluster0.paf8mem.mongodb.net/tabloid-app?retryWrites=true&w=majority`;
     await mongoose_1.default.connect(mongoUrl);
@@ -44,13 +52,14 @@ const main = async () => {
             httpOnly: true,
             secure: constant_1.__prod__,
             sameSite: 'lax',
+            domain: constant_1.__prod__ ? '.vercel.app' : undefined,
         },
         secret: process.env.SESSION_SECRET_DEV_PROD,
         saveUninitialized: false,
         resave: false,
     }));
     app.use((0, cors_1.default)({
-        origin: 'http://localhost:3000',
+        origin: constant_1.__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV,
         credentials: true,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
@@ -63,7 +72,7 @@ const main = async () => {
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });
-    const PORT = process.env.PORT;
+    const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => console.log(`server started on port ${PORT} started server GraphQl on http://localhost:${PORT}${apolloServer.graphqlPath}`));
 };
 main().catch((error) => console.log(error));
