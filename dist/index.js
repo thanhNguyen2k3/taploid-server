@@ -22,22 +22,16 @@ const Post_1 = require("./entities/Post");
 const post_1 = require("./resolvers/post");
 const Upvote_1 = require("./entities/Upvote");
 const dataLoader_1 = require("./utils/dataLoader");
-const path_1 = __importDefault(require("path"));
 const main = async () => {
-    const connection = await (0, typeorm_1.createConnection)(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: 'postgres' }, (constant_1.__prod__ ? { url: process.env.DATABASE_URL } : {
+    const connection = await (0, typeorm_1.createConnection)({
+        type: 'postgres',
         database: 'tabloid',
         username: process.env.DB_USERNAME_DEV,
         password: process.env.DB_PASSWORD_DEV,
-    })), { logging: true }), (constant_1.__prod__ ? {
-        extra: {
-            ssl: {
-                rejectUnauthorized: false,
-            }
-        },
-        ssl: true
-    } : {})), (constant_1.__prod__ ? {} : {
+        logging: true,
+        entities: [User_1.User, Post_1.Post, Upvote_1.Upvote],
         synchronize: true,
-    })), { entities: [User_1.User, Post_1.Post, Upvote_1.Upvote], migrations: [path_1.default.join(__dirname, '/migrations/*')] }));
+    });
     if (!constant_1.__prod__)
         await connection.runMigrations();
     const app = (0, express_1.default)();

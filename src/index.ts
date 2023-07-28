@@ -20,33 +20,41 @@ import { Post } from './entities/Post';
 import { PostResolver } from './resolvers/post';
 import { Upvote } from './entities/Upvote';
 import { buildDataLoaders } from './utils/dataLoader';
-import path from 'path';
+// import path from 'path';
 
 const main = async () => {
     const connection = await createConnection({
+        // type: 'postgres',
+        // ...(__prod__ ? {url:process.env.DATABASE_URL} : {
+        //     database: 'tabloid',
+        //     username: process.env.DB_USERNAME_DEV,
+        //     password: process.env.DB_PASSWORD_DEV,
+        // }),
+        // logging: true,
+        // ...(__prod__ ? {
+        //     extra: {
+        //         ssl: {
+        //             rejectUnauthorized:false,
+        //         }
+        //     },
+        //     ssl: true
+        // } : {}),
+        // ...(__prod__ ? {} : {
+        //     synchronize: true,
+        // }),
+        // entities: [User, Post, Upvote],
+        // migrations: [path.join(__dirname, '/migrations/*')],
         type: 'postgres',
-        ...(__prod__ ? {url:process.env.DATABASE_URL} : {
-            database: 'tabloid',
-            username: process.env.DB_USERNAME_DEV,
-            password: process.env.DB_PASSWORD_DEV,
-        }),
+        database: 'tabloid',
+        username: process.env.DB_USERNAME_DEV,
+        password: process.env.DB_PASSWORD_DEV,
         logging: true,
-        ...(__prod__ ? {
-            extra: {
-                ssl: {
-                    rejectUnauthorized:false,
-                }
-            },
-            ssl: true
-        } : {}),
-        ...(__prod__ ? {} : {
-            synchronize: true,
-        }),
         entities: [User, Post, Upvote],
-        migrations: [path.join(__dirname, '/migrations/*')],
+        synchronize: true,
+        // migrations: [path.join(__dirname, '/migrations/*')],
     });
 
-    if(!__prod__) await connection.runMigrations();
+    if (!__prod__) await connection.runMigrations();
 
     // send Email
     // App
