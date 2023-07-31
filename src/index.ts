@@ -21,6 +21,7 @@ import { PostResolver } from './resolvers/post';
 import { Upvote } from './entities/Upvote';
 import { buildDataLoaders } from './utils/dataLoader';
 import path from 'path';
+import pg from 'pg';
 // import path from 'path';
 
 const main = async () => {
@@ -37,6 +38,14 @@ const main = async () => {
     //         console.log('Connected to PostgreSQL successfully');
     //     }
     // });
+
+    const { Pool } = pg;
+
+    const pool = new Pool({
+        connectionString: process.env.POSTGRES_URL + '?sslmode=require',
+    });
+
+    pool.connect();
 
     const connection = await createConnection({
         type: 'postgres',

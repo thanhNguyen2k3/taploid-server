@@ -23,7 +23,13 @@ const post_1 = require("./resolvers/post");
 const Upvote_1 = require("./entities/Upvote");
 const dataLoader_1 = require("./utils/dataLoader");
 const path_1 = __importDefault(require("path"));
+const pg_1 = __importDefault(require("pg"));
 const main = async () => {
+    const { Pool } = pg_1.default;
+    const pool = new Pool({
+        connectionString: process.env.POSTGRES_URL + '?sslmode=require',
+    });
+    pool.connect();
     const connection = await (0, typeorm_1.createConnection)(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: 'postgres' }, (constant_1.__prod__
         ? { url: process.env.POSTGRES_URL }
         : {
