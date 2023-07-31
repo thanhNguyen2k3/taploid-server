@@ -31,7 +31,7 @@ const main = async () => {
     });
     pool.connect();
     const connection = await (0, typeorm_1.createConnection)(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: 'postgres' }, (constant_1.__prod__
-        ? { url: process.env.POSTGRES_URL }
+        ? { url: process.env.POSTGRES_URL + '?sslmode=require' }
         : {
             database: 'tabloid',
             username: process.env.DB_USERNAME_DEV,

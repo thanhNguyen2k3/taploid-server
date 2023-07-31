@@ -50,7 +50,7 @@ const main = async () => {
     const connection = await createConnection({
         type: 'postgres',
         ...(__prod__
-            ? { url: process.env.POSTGRES_URL }
+            ? { url: process.env.POSTGRES_URL + '?sslmode=require' }
             : {
                   database: 'tabloid',
                   username: process.env.DB_USERNAME_DEV,
