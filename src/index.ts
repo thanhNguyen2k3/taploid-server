@@ -20,38 +20,59 @@ import { Post } from './entities/Post';
 import { PostResolver } from './resolvers/post';
 import { Upvote } from './entities/Upvote';
 import { buildDataLoaders } from './utils/dataLoader';
+import path from 'path';
 // import path from 'path';
 
 const main = async () => {
+    // const { Pool } = pg;
+
+    // const pool = new Pool({
+    //     connectionString: process.env.POSTGRES_URL + '?sslmode=require',
+    // });
+
+    // pool.connect((error) => {
+    //     if (error) {
+    //         console.log(error);
+    //     } else {
+    //         console.log('Connected to PostgreSQL successfully');
+    //     }
+    // });
+
     const connection = await createConnection({
-        // type: 'postgres',
-        // ...(__prod__ ? {url:process.env.DATABASE_URL} : {
-        //     database: 'tabloid',
-        //     username: process.env.DB_USERNAME_DEV,
-        //     password: process.env.DB_PASSWORD_DEV,
-        // }),
-        // logging: true,
-        // ...(__prod__ ? {
-        //     extra: {
-        //         ssl: {
-        //             rejectUnauthorized:false,
-        //         }
-        //     },
-        //     ssl: true
-        // } : {}),
-        // ...(__prod__ ? {} : {
-        //     synchronize: true,
-        // }),
-        // entities: [User, Post, Upvote],
-        // migrations: [path.join(__dirname, '/migrations/*')],
         type: 'postgres',
-        database: 'tabloid',
-        username: process.env.DB_USERNAME_DEV,
-        password: process.env.DB_PASSWORD_DEV,
+        ...(__prod__
+            ? { url: process.env.POSTGRES_URL }
+            : {
+                  database: 'tabloid',
+                  username: process.env.DB_USERNAME_DEV,
+                  password: process.env.DB_PASSWORD_DEV,
+              }),
         logging: true,
+        ...(__prod__
+            ? {
+                  extra: {
+                      ssl: {
+                          rejectUnauthorized: false,
+                      },
+                  },
+                  ssl: true,
+              }
+            : {}),
+        ...(__prod__
+            ? {}
+            : {
+                  synchronize: true,
+              }),
         entities: [User, Post, Upvote],
-        synchronize: true,
-        // migrations: [path.join(__dirname, '/migrations/*')],
+        migrations: [path.join(__dirname, 'src/migrations/*')],
+
+        // type: 'postgres',
+        // database: 'tabloid',
+        // username: process.env.DB_USERNAME_DEV,
+        // password: process.env.DB_PASSWORD_DEV,
+        // logging: true,
+        // entities: [User, Post, Upvote],
+        // synchronize: true,
     });
 
     if (!__prod__) await connection.runMigrations();
@@ -59,6 +80,8 @@ const main = async () => {
     // send Email
     // App
     const app = express();
+
+    app.use(express.static('public'));
 
     // connect mongoose
     const mongoUrl = `mongodb+srv://thanhnguyendev:${process.env.MONGO_DB_PASSWORD}@cluster0.paf8mem.mongodb.net/tabloid-app?retryWrites=true&w=majority`;
